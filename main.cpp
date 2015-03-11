@@ -23,10 +23,7 @@ int WINAPI WinMain(HINSTANCE hInstance,
 	if(result)
 	{
 		fout << "It Worked!";
-	}
-	else
-	{
-		fout << "Framework Not Initialized /n";
+		framework_Inst->Run();
 	}
 	
 	framework_Inst->Shutdown();

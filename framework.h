@@ -3,6 +3,9 @@
 
 #define WIN32_LEAN_AND_MEAN
 
+#include "inputDevice.h"
+#include "output.h"
+#include <tchar.h>
 #include <windows.h>
 
 class Framework
@@ -23,6 +26,8 @@ class Framework
 		void InitializeWindows(int&, int&);
 		void ShutdownWindows();
 		
+		inputDevice* keyboard_mouse;
+
 		LPCSTR m_appName;
 		HINSTANCE m_hinstance;
 		HWND m_hwnd;

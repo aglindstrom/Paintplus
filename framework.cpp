@@ -22,17 +22,38 @@ bool Framework::Initialize()
 	
 	width = 0;
 	height = 0;
+
+	keyboard_mouse = new inputDevice;
+	result = keyboard_mouse->Initialize();
 	
 	InitializeWindows(width, height);
-	
+
 	return true;
 }
 
 void Framework::Shutdown()
 {
+	delete keyboard_mouse;
+	keyboard_mouse = 0;
+
 	ShutdownWindows();
 	
 	return;
+}
+
+void Framework::Run()
+{
+	bool running = true;
+	int i = 0;
+
+	while(running)
+	{
+		if(keyboard_mouse->IsKeyDown(27))
+		{
+			running = false;
+		}
+		i++;
+	}
 }
 
 void Framework::InitializeWindows(int& width, int& height)
@@ -49,19 +70,19 @@ void Framework::InitializeWindows(int& width, int& height)
 	wcex.cbSize 			= sizeof(WNDCLASSEX);
 	wcex.style 				= CS_HREDRAW|CS_VREDRAW|CS_OWNDC;
 	wcex.lpfnWndProc 		= WndProc;
-	wcex.cbClsExtra		= 0;
-	wcex.cbWndExtra		= 0;
-	wcex.hInstance 		= m_hinstance;
+	wcex.cbClsExtra			= 0;
+	wcex.cbWndExtra			= 0;
+	wcex.hInstance 			= m_hinstance;
 	wcex.hIcon				= LoadIcon(NULL, IDI_WINLOGO);
 	wcex.hCursor			= LoadCursor(NULL, IDC_ARROW);
-	wcex.hbrBackground	= (HBRUSH)GetStockObject(BLACK_BRUSH);
+	wcex.hbrBackground		= (HBRUSH)GetStockObject(BLACK_BRUSH);
 	wcex.lpszMenuName		= NULL;
-	wcex.lpszClassName	= m_appName;
+	wcex.lpszClassName		= m_appName;
 	wcex.hIconSm			= wcex.hIcon;
 	
 	if(!RegisterClassEx(&wcex))
 	{
-   	return;
+   		return;
 	}
 	
 	width  = GetSystemMetrics(SM_CXSCREEN);
@@ -131,10 +152,12 @@ LRESULT CALLBACK Framework::MessageHandler(HWND hwnd, UINT message, WPARAM wpara
 	{
 		case WM_KEYDOWN:
 		{
+			keyboard_mouse->KeyDown((unsigned int)wparam);
 			return 0;
 		}
 		case WM_KEYUP:
 		{
+			keyboard_mouse->KeyUp((unsigned int)wparam);
 			return 0;
 		}
 		

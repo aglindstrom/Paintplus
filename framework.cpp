@@ -24,7 +24,7 @@ bool Framework::Initialize()
 	height = 0;
 
 	keyboard_mouse = new inputDevice;
-	result = keyboard_mouse->Initialize();
+	keyboard_mouse->Initialize();
 	
 	InitializeWindows(width, height);
 

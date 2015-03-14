@@ -33,8 +33,18 @@ bool Framework::Initialize()
 
 void Framework::Shutdown()
 {
-	delete keyboard_mouse;
-	keyboard_mouse = 0;
+	if(keyboard_mouse)
+	{
+		delete keyboard_mouse;
+		keyboard_mouse = 0;
+	}
+
+	if(m_openGL)
+	{
+		m_openGL->Shutdown(m_hwnd);
+		delete m_openGL;
+		m_openGL = 0;	
+	}
 
 	ShutdownWindows();
 	
@@ -60,6 +70,7 @@ void Framework::InitializeWindows(int& width, int& height)
 {
 	WNDCLASSEX wcex;
 	int posX, posY;
+	bool result;
 	
 	ApplicationHandle = this;
 	
@@ -85,22 +96,55 @@ void Framework::InitializeWindows(int& width, int& height)
    		return;
 	}
 	
-	width  = GetSystemMetrics(SM_CXSCREEN);
-	height = GetSystemMetrics(SM_CYSCREEN);
-	
-	posX = (GetSystemMetrics(SM_CXSCREEN) - width)/2;
-	posY = (GetSystemMetrics(SM_CYSCREEN) - height)/2;
-	
 	m_hwnd = CreateWindowEx(WS_EX_APPWINDOW, 
 									m_appName, 
 									m_appName, 
 									WS_OVERLAPPEDWINDOW,
-									posX, posY,
-									width, height,
+									0,0,
+									640, 480,
 									NULL, NULL, 
 									m_hinstance,
 									NULL);
 									
+	ShowWindow(m_hwnd, SW_HIDE);
+
+	result = m_openGL->InitializeExtensions(m_hwnd);
+	if(!result)
+	{
+		MessageBox(m_hwnd, _T("Could not Initialize OpenGL extensions"), _T("It didn't work"), MB_OK);
+		return;
+	}
+
+	DestroyWindow(m_hwnd);
+	m_hwnd = NULL;
+
+	width = GetSystemMetrics(SM_CXSCREEN);
+	height = GetSystemMetrics(SM_CYSCREEN);
+
+	posX = 0;
+	posY = 0;
+
+	m_hwnd = CreateWindowEx(WS_EX_APPWINDOW, 
+							m_appName, 
+							m_appName, 
+							WS_OVERLAPPEDWINDOW,
+							posX, posY,
+							width, height,
+							NULL, NULL, 
+							m_hinstance,
+							NULL);
+	if(m_hwnd == NULL)
+	{
+		return;
+	}
+
+	result = m_openGL->InitializeOGL(m_hwnd, width, height, SCREEN_DEPTH, SCREEN_NEAR, VSYNC_ENABLED);
+	if(!result)
+	{
+		MessageBox(m_hwnd, _T("Could Not Initialize OpenGL, check OpenGL 4.0 support"), _T("It didn't work"), MB_OK);
+		return;
+	}
+
 	ShowWindow(m_hwnd, SW_SHOW);
 	SetForegroundWindow(m_hwnd);
 	SetFocus(m_hwnd);

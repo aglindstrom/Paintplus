@@ -5,6 +5,7 @@
 
 #include "inputDevice.h"
 #include "output.h"
+#include "ogl.h"
 #include <tchar.h>
 #include <windows.h>
 
@@ -27,6 +28,7 @@ class Framework
 		void ShutdownWindows();
 		
 		inputDevice* keyboard_mouse;
+		OGL* m_openGL;
 
 		LPCSTR m_appName;
 		HINSTANCE m_hinstance;

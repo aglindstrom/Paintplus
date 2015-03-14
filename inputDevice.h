@@ -10,7 +10,7 @@ class inputDevice
 		inputDevice(const inputDevice&);
 		~inputDevice();
 		
-		void Initialize();
+		bool Initialize();
 		void KeyDown(unsigned int);
 		void KeyUp(unsigned int);
 		bool IsKeyDown(unsigned int);

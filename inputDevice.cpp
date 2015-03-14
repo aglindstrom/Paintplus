@@ -15,14 +15,14 @@ inputDevice::~inputDevice()
 
 }
 
-void inputDevice::Initialize()
+bool inputDevice::Initialize()
 {
 	for(int i = 0; i < 256; i++)
 	{
 		m_keys[i] = false;
 	}
 	
-	return;
+	return true;
 }
 
 void inputDevice::KeyDown(unsigned int input)

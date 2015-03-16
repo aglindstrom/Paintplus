@@ -17,13 +17,12 @@ OGL::~OGL()
 
 bool OGL::InitializeExtensions(HWND hwnd)
 {
+
 	HDC deviceContext;
 	PIXELFORMATDESCRIPTOR pixelFormat;
 	int error;
 	HGLRC renderContext;
 	bool result;
-
-	
 
 	deviceContext = GetDC(hwnd);
 	if(!deviceContext)
@@ -32,6 +31,7 @@ bool OGL::InitializeExtensions(HWND hwnd)
 		return false;
 	}
 
+	
 	error = SetPixelFormat(deviceContext, 1, &pixelFormat);
 	if(error != 1)
 	{
@@ -39,6 +39,7 @@ bool OGL::InitializeExtensions(HWND hwnd)
 		return false;
 	}
 
+	
 	renderContext = wglCreateContext(deviceContext);
 	if(!renderContext)
 	{
@@ -46,6 +47,7 @@ bool OGL::InitializeExtensions(HWND hwnd)
 		return false;
 	}
 
+	
 	error = wglMakeCurrent(deviceContext, renderContext);
 	if(error != 1)
 	{
@@ -53,7 +55,7 @@ bool OGL::InitializeExtensions(HWND hwnd)
 		return false;
 	}
 
-	result = LoadExtensionList(hwnd);
+	result = LoadExtensionList();
 	if(!result)
 	{
 		MessageBox(hwnd, _T("Load Extensions Failure"), _T("ERROR"), MB_OK);
@@ -122,6 +124,12 @@ bool OGL::InitializeOGL(HWND hwnd, int width, int height, float screenDepth, flo
 		return false;
 	}
 
+	result = SetPixelFormat(m_deviceContext, pixelFormat[0], &pixelFormatDescriptor);
+	if(result != 1)
+	{
+		return false;
+	}
+
 	attribList[0] = WGL_CONTEXT_MAJOR_VERSION_ARB;
 	attribList[1] = 4;
 	attribList[2] = WGL_CONTEXT_MINOR_VERSION_ARB;
@@ -160,9 +168,9 @@ bool OGL::InitializeOGL(HWND hwnd, int width, int height, float screenDepth, flo
 	vendorString = (char*)glGetString(GL_VENDOR);
 	renderString = (char*)glGetString(GL_RENDERER);
 
-	strcpy(m_videoCardDescription, vendorString);
-	strcat(m_videoCardDescription, "-");
-	strcat(m_videoCardDescription, renderString);
+	strcpy_s(m_videoCardDescription, vendorString);
+	strcat_s(m_videoCardDescription, "-");
+	strcat_s(m_videoCardDescription, renderString);
 
 	if(vSync)
 	{
@@ -215,250 +223,253 @@ void OGL::EndScene()
 	return;
 }
 
-bool OGL::LoadExtensionList(HWND hwnd)
+bool OGL::LoadExtensionList()
 {
 	wglChoosePixelFormatARB = (PFNWGLCHOOSEPIXELFORMATARBPROC)wglGetProcAddress("wglChoosePixelFormatARB");
 	if(!wglChoosePixelFormatARB)
 	{
-		MessageBox(hwnd, _T("Choose PX Format"), _T("ERROR"), MB_OK);
+		//MessageBox(hwnd, _T("Choose PX Format"), _T("ERROR"), MB_OK);
 		return false;
 	}
 
 	wglCreateContextAttribsARB = (PFNWGLCREATECONTEXTATTRIBSARBPROC)wglGetProcAddress("wglCreateContextAttribsARB");
 	if(!wglCreateContextAttribsARB)
 	{
-		MessageBox(hwnd, _T("Create Context Attribs"), _T("ERROR"), MB_OK);
+		//MessageBox(hwnd, _T("Create Context Attribs"), _T("ERROR"), MB_OK);
 		return false;
 	}
 
+	
 	wglSwapIntervalEXT = (PFNWGLSWAPINTERVALEXTPROC)wglGetProcAddress("wglSwapIntervalEXT");
 	if(!wglSwapIntervalEXT)
 	{
-		MessageBox(hwnd, _T("Swap Interval"), _T("ERROR"), MB_OK);
+		//MessageBox(hwnd, _T("Swap Interval"), _T("ERROR"), MB_OK);
 		return false;
 	}
 
+	
 	glAttachShader = (PFNGLATTACHSHADERPROC)wglGetProcAddress("glAttachShader");
 	if(!glAttachShader)
 	{
-		MessageBox(hwnd, _T("Attach Shader"), _T("ERROR"), MB_OK);
+		//MessageBox(hwnd, _T("Attach Shader"), _T("ERROR"), MB_OK);
 		return false;
 	}
 
+	
 	glBindBuffer = (PFNGLBINDBUFFERPROC)wglGetProcAddress("glBindBuffer");
 	if(!glBindBuffer)
 	{
-		MessageBox(hwnd, _T("Bind Buffer"), _T("ERROR"), MB_OK);
+		//MessageBox(hwnd, _T("Bind Buffer"), _T("ERROR"), MB_OK);
 		return false;
 	}
 
 	glBindVertexArray = (PFNGLBINDVERTEXARRAYPROC)wglGetProcAddress("glBindVertexArray");
 	if(!glBindVertexArray)
 	{
-		MessageBox(hwnd, _T("Bind Vertex Array"), _T("ERROR"), MB_OK);
+		//MessageBox(hwnd, _T("Bind Vertex Array"), _T("ERROR"), MB_OK);
 		return false;
 	}
 
 	glBufferData = (PFNGLBUFFERDATAPROC)wglGetProcAddress("glBufferData");
 	if(!glBufferData)
 	{
-		MessageBox(hwnd, _T("Buffer Data"), _T("ERROR"), MB_OK);
+		//MessageBox(hwnd, _T("Buffer Data"), _T("ERROR"), MB_OK);
 		return false;
 	}
 
 	glCompileShader = (PFNGLCOMPILESHADERPROC)wglGetProcAddress("glCompileShader");
 	if(!glCompileShader)
 	{
-		MessageBox(hwnd, _T("Compile Shader"), _T("ERROR"), MB_OK);
+		//MessageBox(hwnd, _T("Compile Shader"), _T("ERROR"), MB_OK);
 		return false;
 	}
 
 	glCreateProgram = (PFNGLCREATEPROGRAMPROC)wglGetProcAddress("glCreateProgram");
 	if(!glCreateProgram)
 	{
-		MessageBox(hwnd, _T("Create Program"), _T("ERROR"), MB_OK);
+		//MessageBox(hwnd, _T("Create Program"), _T("ERROR"), MB_OK);
 		return false;
 	}
 
 	glCreateShader = (PFNGLCREATESHADERPROC)wglGetProcAddress("glCreateShader");
 	if(!glCreateShader)
 	{
-		MessageBox(hwnd, _T("Create Shader"), _T("ERROR"), MB_OK);
+		//MessageBox(hwnd, _T("Create Shader"), _T("ERROR"), MB_OK);
 		return false;
 	}
 
 	glDeleteBuffers = (PFNGLDELETEBUFFERSPROC)wglGetProcAddress("glDeleteBuffers");
 	if(!glDeleteBuffers)
 	{
-		MessageBox(hwnd, _T("Delete Buffers"), _T("ERROR"), MB_OK);
+		//MessageBox(hwnd, _T("Delete Buffers"), _T("ERROR"), MB_OK);
 		return false;
 	}
 
 	glDeleteProgram = (PFNGLDELETEPROGRAMPROC)wglGetProcAddress("glDeleteProgram");
 	if(!glDeleteProgram)
 	{
-		MessageBox(hwnd, _T("Delete Program"), _T("ERROR"), MB_OK);
+		//MessageBox(hwnd, _T("Delete Program"), _T("ERROR"), MB_OK);
 		return false;
 	}
 
 	glDeleteShader = (PFNGLDELETESHADERPROC)wglGetProcAddress("glDeleteShader");
 	if(!glDeleteShader)
 	{
-		MessageBox(hwnd, _T("Delete Shader"), _T("ERROR"), MB_OK);
+		//MessageBox(hwnd, _T("Delete Shader"), _T("ERROR"), MB_OK);
 		return false;
 	}
 
 	glDetachShader = (PFNGLDETACHSHADERPROC)wglGetProcAddress("glDetachShader");
 	if(!glDetachShader)
 	{
-		MessageBox(hwnd, _T("Detach Shader"), _T("ERROR"), MB_OK);
+		//MessageBox(hwnd, _T("Detach Shader"), _T("ERROR"), MB_OK);
 		return false;
 	}
 
 	glEnableVertexAttribArray = (PFNGLENABLEVERTEXATTRIBARRAYPROC)wglGetProcAddress("glEnableVertexAttribArray");
 	if(!glEnableVertexAttribArray)
 	{
-		MessageBox(hwnd, _T("Enable Vertex Attrib Array"), _T("ERROR"), MB_OK);
+		//MessageBox(hwnd, _T("Enable Vertex Attrib Array"), _T("ERROR"), MB_OK);
 		return false;
 	}
 
 	glGenBuffers = (PFNGLGENBUFFERSPROC)wglGetProcAddress("glGenBuffers");
 	if(!glGenBuffers)
 	{
-		MessageBox(hwnd, _T("Gen Buffers"), _T("ERROR"), MB_OK);
+		//MessageBox(hwnd, _T("Gen Buffers"), _T("ERROR"), MB_OK);
 		return false;
 	}
 
 	glGenVertexArrays = (PFNGLGENVERTEXARRAYSPROC)wglGetProcAddress("glGenVertexArrays");
 	if(!glGenVertexArrays)
 	{
-		MessageBox(hwnd, _T("Gen Vertex Arrays"), _T("ERROR"), MB_OK);
+		//MessageBox(hwnd, _T("Gen Vertex Arrays"), _T("ERROR"), MB_OK);
 		return false;
 	}
 
 	glGetAttribLocation = (PFNGLGETATTRIBLOCATIONPROC)wglGetProcAddress("glGetAttribLocation");
 	if(!glGenVertexArrays)
 	{
-		MessageBox(hwnd, _T("Get Attrib Location"), _T("ERROR"), MB_OK);
+		//MessageBox(hwnd, _T("Get Attrib Location"), _T("ERROR"), MB_OK);
 		return false;
 	}
 
 	glGetProgramInfoLog = (PFNGLGETPROGRAMINFOLOGPROC)wglGetProcAddress("glGetProgramInfoLog");
 	if(!glGetProgramInfoLog)
 	{
-		MessageBox(hwnd, _T("Get Program Info Log"), _T("ERROR"), MB_OK);
+		//MessageBox(hwnd, _T("Get Program Info Log"), _T("ERROR"), MB_OK);
 		return false;
 	}
 
 	glGetProgramIV = (PFNGLGETPROGRAMIVPROC)wglGetProcAddress("glGetProgramiv");
 	if(!glGetProgramIV)
 	{
-		MessageBox(hwnd, _T("CGet Program IV"), _T("ERROR"), MB_OK);
+		//MessageBox(hwnd, _T("CGet Program IV"), _T("ERROR"), MB_OK);
 		return false;
 	}
 
 	glGetShaderInfoLog = (PFNGLGETSHADERINFOLOGPROC)wglGetProcAddress("glGetShaderInfoLog");
 	if(!glGetShaderInfoLog)
 	{
-		MessageBox(hwnd, _T("Get Shader Info Log"), _T("ERROR"), MB_OK);
+		//MessageBox(hwnd, _T("Get Shader Info Log"), _T("ERROR"), MB_OK);
 		return false;
 	}
 
 	glGetShaderIV = (PFNGLGETSHADERIVPROC)wglGetProcAddress("glGetShaderiv");
 	if(!glGetShaderIV)
 	{
-		MessageBox(hwnd, _T("Get Shader IV"), _T("ERROR"), MB_OK);
+		//MessageBox(hwnd, _T("Get Shader IV"), _T("ERROR"), MB_OK);
 		return false;
 	}
 
 	glLinkProgram = (PFNGLLINKPROGRAMPROC)wglGetProcAddress("glLinkProgram");
 	if(!glLinkProgram)
 	{
-		MessageBox(hwnd, _T("Link Program"), _T("ERROR"), MB_OK);
+		//MessageBox(hwnd, _T("Link Program"), _T("ERROR"), MB_OK);
 		return false;
 	}
 
 	glShaderSource = (PFNGLSHADERSOURCEPROC)wglGetProcAddress("glShaderSource");
 	if(!glShaderSource)
 	{
-		MessageBox(hwnd, _T("Shader Source"), _T("ERROR"), MB_OK);
+		//MessageBox(hwnd, _T("Shader Source"), _T("ERROR"), MB_OK);
 		return false;
 	}
 
 	glUseProgram = (PFNGLUSEPROGRAMPROC)wglGetProcAddress("glUseProgram");
 	if(!glUseProgram)
 	{
-		MessageBox(hwnd, _T("Use Program"), _T("ERROR"), MB_OK);
+		//MessageBox(hwnd, _T("Use Program"), _T("ERROR"), MB_OK);
 		return false;
 	}
 
 	glVertexAttribPointer = (PFNGLVERTEXATTRIBPOINTERPROC)wglGetProcAddress("glVertexAttribPointer");
 	if(!glVertexAttribPointer)
 	{
-		MessageBox(hwnd, _T("CVertex Attrib Pointer"), _T("ERROR"), MB_OK);
+		//MessageBox(hwnd, _T("CVertex Attrib Pointer"), _T("ERROR"), MB_OK);
 		return false;
 	}
 
 	glBindAttribLocation = (PFNGLBINDATTRIBLOCATIONPROC)wglGetProcAddress("glBindAttribLocation");
 	if(!glBindAttribLocation)
 	{
-		MessageBox(hwnd, _T("Bind Attrib Location"), _T("ERROR"), MB_OK);
+		//MessageBox(hwnd, _T("Bind Attrib Location"), _T("ERROR"), MB_OK);
 		return false;
 	}
 
 	glGetUniformLocation = (PFNGLGETUNIFORMLOCATIONPROC)wglGetProcAddress("glGetUniformLocation");
 	if(!glGetUniformLocation)
 	{
-		MessageBox(hwnd, _T("Get Uniform Location"), _T("ERROR"), MB_OK);
+		//MessageBox(hwnd, _T("Get Uniform Location"), _T("ERROR"), MB_OK);
 		return false;
 	}
 
 	glUniformMatrix4fv = (PFNGLUNIFORMMATRIX4FVPROC)wglGetProcAddress("glUniformMatrix4fv");
 	if(!glUniformMatrix4fv)
 	{
-		MessageBox(hwnd, _T("Uniform Matrix 4 fv"), _T("ERROR"), MB_OK);
+		//MessageBox(hwnd, _T("Uniform Matrix 4 fv"), _T("ERROR"), MB_OK);
 		return false;
 	}
 
 	glActiveTexture = (PFNGLACTIVETEXTUREPROC)wglGetProcAddress("glActiveTexture");
 	if(!glActiveTexture)
 	{
-		MessageBox(hwnd, _T("Active Texture"), _T("ERROR"), MB_OK);
+		//MessageBox(hwnd, _T("Active Texture"), _T("ERROR"), MB_OK);
 		return false;
 	}
 
 	glUniform1i = (PFNGLUNIFORM1IPROC)wglGetProcAddress("glUniform1i");
 	if(!glUniform1i)
 	{
-		MessageBox(hwnd, _T("Uniform 1i"), _T("ERROR"), MB_OK);
+		//MessageBox(hwnd, _T("Uniform 1i"), _T("ERROR"), MB_OK);
 		return false;
 	}
 
 	glGenerateMipmap = (PFNGLGENERATEMIPMAPPROC)wglGetProcAddress("glGenerateMipmap");
 	if(!glGenerateMipmap)
 	{
-		MessageBox(hwnd, _T("Generate MipMap"), _T("ERROR"), MB_OK);
+		//MessageBox(hwnd, _T("Generate MipMap"), _T("ERROR"), MB_OK);
 		return false;
 	}
 
 	glDisableVertexAttribArray = (PFNGLDISABLEVERTEXATTRIBARRAYPROC)wglGetProcAddress("glDisableVertexAttribArray");
 	if(!glDisableVertexAttribArray)
 	{
-		MessageBox(hwnd, _T("Disable Vertex Attrib Array"), _T("ERROR"), MB_OK);
+		//MessageBox(hwnd, _T("Disable Vertex Attrib Array"), _T("ERROR"), MB_OK);
 		return false;
 	}
 
 	glUniform3fv = (PFNGLUNIFORM3FVPROC)wglGetProcAddress("glUniform3fv");
 	if(!glUniform3fv)
 	{
-		MessageBox(hwnd, _T("Uniform 3fv"), _T("ERROR"), MB_OK);
+		//MessageBox(hwnd, _T("Uniform 3fv"), _T("ERROR"), MB_OK);
 		return false;
 	}
 
 	glUniform4fv = (PFNGLUNIFORM4FVPROC)wglGetProcAddress("glUniform4fv");
 	if(!glUniform4fv)
 	{
-		MessageBox(hwnd, _T("Uniform 4fv"), _T("ERROR"), MB_OK);
+		//MessageBox(hwnd, _T("Uniform 4fv"), _T("ERROR"), MB_OK);
 		return false;
 	}
 
@@ -517,7 +528,7 @@ void OGL::GetProjectionMatrix(float* matrix)
 
 void OGL::GetVideoCardInfo(char* cardName)
 {
-	strcpy(cardName,m_videoCardDescription);
+	strcpy_s(cardName,128, m_videoCardDescription);
 	return;
 }
 

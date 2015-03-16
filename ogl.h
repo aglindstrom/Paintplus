@@ -1,10 +1,12 @@
 #ifndef _OGL_H_
 #define _OGL_H_
 
+#pragma comment(lib, "opengl32.lib")
+
 #include <windows.h>
 #include <string.h>
 #include <cstddef>
-#include <gl\gl.h>
+#include <GL\gl.h>
 #include <math.h>
 #include <tchar.h>
 
@@ -33,13 +35,13 @@
 #define GL_BGRA							0x80E1
 #define GL_ELEMENT_ARRAY_BUFFER			0x8893
 
-typedef BOOL (WINAPI * PFNWGLCHOOSEPIXELFORMATARBPROC)(HDC hdc, const int *piAttribIList, const FLOAT *pfAttribFList, UINT nMaxFormats, int *piFormats, UINT *nNumFormats);
+typedef BOOL (WINAPI * PFNWGLCHOOSEPIXELFORMATARBPROC) (HDC hdc, const int *piAttribIList, const FLOAT *pfAttribFList, UINT nMaxFormats, int *piFormats, UINT *nNumFormats);
 typedef HGLRC (WINAPI * PFNWGLCREATECONTEXTATTRIBSARBPROC)(HDC hDC, HGLRC hShareContext, const int *attribList);
 typedef BOOL (WINAPI * PFNWGLSWAPINTERVALEXTPROC)(int interval);
 typedef void (APIENTRY * PFNGLATTACHSHADERPROC)(GLuint program, GLuint shader);
 typedef void (APIENTRY * PFNGLBINDBUFFERPROC)(GLenum target, GLuint buffer);
 typedef void (APIENTRY * PFNGLBINDVERTEXARRAYPROC)(GLuint array);
-typedef void (APIENTRY * PFNGLBUFFERDATAPROC)(GLenum target, std::ptrdiff_t size, const GLvoid*data, GLenum usage);
+typedef void (APIENTRY * PFNGLBUFFERDATAPROC)(GLenum target, ptrdiff_t size, const GLvoid*data, GLenum usage);
 typedef void (APIENTRY * PFNGLCOMPILESHADERPROC)(GLuint shader);
 typedef GLuint (APIENTRY * PFNGLCREATEPROGRAMPROC)(void);
 typedef GLuint (APIENTRY * PFNGLCREATESHADERPROC)(GLenum type);
@@ -93,6 +95,21 @@ class OGL
 		void MatrixRotationY(float*, float);
 		void MatrixTranslation(float*, float, float, float);
 		void MatrixMultiply(float*, float*, float*);
+		
+	private:
+		bool LoadExtensionList();
+
+		HDC m_deviceContext;
+		HGLRC m_renderingContext;
+		PFNWGLCHOOSEPIXELFORMATARBPROC wglChoosePixelFormatARB; 
+		PFNWGLCREATECONTEXTATTRIBSARBPROC wglCreateContextAttribsARB; 
+		PFNWGLSWAPINTERVALEXTPROC wglSwapIntervalEXT; 
+
+		float m_worldMatrix[16];
+		float m_projectionMatrix[16];
+		char m_videoCardDescription[128];
+
+	public:
 
 		PFNGLATTACHSHADERPROC glAttachShader;
 		PFNGLBINDBUFFERPROC glBindBuffer;
@@ -127,19 +144,6 @@ class OGL
 		PFNGLDISABLEVERTEXATTRIBARRAYPROC glDisableVertexAttribArray;
 		PFNGLUNIFORM3FVPROC glUniform3fv;
 		PFNGLUNIFORM4FVPROC glUniform4fv;
-		
-	private:
-		bool LoadExtensionList(HWND hwnd);
-
-		HDC m_deviceContext;
-		HGLRC m_renderingContext;
-		PFNWGLCHOOSEPIXELFORMATARBPROC wglChoosePixelFormatARB;
-		PFNWGLCREATECONTEXTATTRIBSARBPROC wglCreateContextAttribsARB;
-		PFNWGLSWAPINTERVALEXTPROC wglSwapIntervalEXT;
-
-		float m_worldMatrix[16];
-		float m_projectionMatrix[16];
-		char m_videoCardDescription[128];
 
 };
 

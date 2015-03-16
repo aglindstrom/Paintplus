@@ -8,7 +8,7 @@ int WINAPI WinMain(HINSTANCE hInstance,
 						)
 {
 	Framework* framework_Inst;
-	bool result;
+	bool result = true;
 	std::ofstream fout;
 	
 	fout.open("error.log");
@@ -25,11 +25,16 @@ int WINAPI WinMain(HINSTANCE hInstance,
 		fout << "It Worked!";
 		framework_Inst->Run();
 	}
+	else
+	{
+		fout << "Framework Failed" << std::endl;
+	}
 	
 	framework_Inst->Shutdown();
 	delete framework_Inst;
 	framework_Inst = 0;
 	
+	fout << "closing";
 	fout.close();
 	
 	return 0;	

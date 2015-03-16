@@ -3,9 +3,13 @@
 
 #define WIN32_LEAN_AND_MEAN
 
+#pragma comment(lib, "user32.lib")
+#pragma comment(lib, "gdi32.lib")
+
 #include "inputDevice.h"
 #include "output.h"
 #include "ogl.h"
+#include <string.h>
 #include <tchar.h>
 #include <windows.h>
 
@@ -24,10 +28,11 @@ class Framework
 		
 	private:
 		bool Frame();
-		void InitializeWindows(int&, int&);
+		bool InitializeWindows(OGL*, int&, int&);
 		void ShutdownWindows();
 		
 		inputDevice* keyboard_mouse;
+		output* m_output;
 		OGL* m_openGL;
 
 		LPCSTR m_appName;

@@ -18,15 +18,34 @@ Framework::~Framework()
 bool Framework::Initialize()
 {
 	int width, height;
-	bool result;
+	bool result = true;
 	
 	width = 0;
 	height = 0;
 
 	keyboard_mouse = new inputDevice;
-	keyboard_mouse->Initialize();
-	
-	InitializeWindows(width, height);
+	result = keyboard_mouse->Initialize();
+	if(!result)
+	{
+		MessageBox(m_hwnd, _T("input failed"), _T("it didn't work"), MB_OK);
+		return false;
+	}
+
+	m_output = new output;
+	result = m_output->Initialize(m_openGL, m_hwnd);
+	if(!result)
+	{
+		MessageBox(m_hwnd, _T("output failed"), _T("it didn't work"), MB_OK);
+		return false;
+	}
+
+	m_openGL = new OGL;
+	if(!m_openGL)
+	{
+		return false;
+	}
+
+	InitializeWindows(m_openGL, width, height);
 
 	return true;
 }
@@ -46,6 +65,13 @@ void Framework::Shutdown()
 		m_openGL = 0;	
 	}
 
+	if(m_output)
+	{
+		m_output->Shutdown();
+		delete m_output;
+		m_output = 0;
+	}
+
 	ShutdownWindows();
 	
 	return;
@@ -53,24 +79,58 @@ void Framework::Shutdown()
 
 void Framework::Run()
 {
-	bool running = true;
-	int i = 0;
+	MSG msg;
+	bool done = false;
 
-	while(running)
+	MessageBox(m_hwnd, _T("RUNNING"), _T("RUNNING"), MB_OK);
+
+	ZeroMemory(&msg, sizeof(MSG));
+
+	while(!done)
 	{
-		if(keyboard_mouse->IsKeyDown(27))
+		if(PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
 		{
-			running = false;
+			TranslateMessage(&msg);
+			DispatchMessage(&msg);
 		}
-		i++;
+
+		if(msg.message == WM_QUIT)
+		{
+			MessageBox(m_hwnd, _T("Quitting"), _T("ERROR"), MB_OK);
+			done = true;
+		}
+		else
+		{
+			if(Frame())
+			{
+				MessageBox(m_hwnd, _T("Bad Render"), _T("ERROR"), MB_OK);
+				done = true;
+			}
+		}
 	}
+	return;
 }
 
-void Framework::InitializeWindows(int& width, int& height)
+bool Framework::Frame()
+{
+	if(keyboard_mouse->IsKeyDown(VK_ESCAPE))
+	{
+		return false;
+	}
+
+	if(!m_output->Frame())
+	{
+		return false;
+	}
+
+	return true;
+}
+
+bool Framework::InitializeWindows(OGL* openGL, int& width, int& height) // Craft a window with open gl interface
 {
 	WNDCLASSEX wcex;
 	int posX, posY;
-	bool result;
+	bool result = true;
 	
 	ApplicationHandle = this;
 	
@@ -93,9 +153,11 @@ void Framework::InitializeWindows(int& width, int& height)
 	
 	if(!RegisterClassEx(&wcex))
 	{
-   		return;
+   		return false;
 	}
 	
+	MessageBox(m_hwnd, _T("Creating Window"), _T("it didn't work"), MB_OK);
+
 	m_hwnd = CreateWindowEx(WS_EX_APPWINDOW, 
 									m_appName, 
 									m_appName, 
@@ -106,44 +168,46 @@ void Framework::InitializeWindows(int& width, int& height)
 									m_hinstance,
 									NULL);
 									
-	ShowWindow(m_hwnd, SW_HIDE);
+	ShowWindow(m_hwnd, SW_SHOW);
 
-	result = m_openGL->InitializeExtensions(m_hwnd);
+	result = openGL->InitializeExtensions(m_hwnd); // Set up the open GL Extensions (tells the computer how to use OGL)
 	if(!result)
 	{
 		MessageBox(m_hwnd, _T("Could not Initialize OpenGL extensions"), _T("It didn't work"), MB_OK);
-		return;
+		return false;
 	}
 
-	DestroyWindow(m_hwnd);
-	m_hwnd = NULL;
+	DestroyWindow(m_hwnd); // Open GL Extensions initialized "refreshing" window
+	//m_hwnd = NULL;
 
-	width = GetSystemMetrics(SM_CXSCREEN);
-	height = GetSystemMetrics(SM_CYSCREEN);
+	width = 800;
+	height = 600;
 
 	posX = 0;
 	posY = 0;
 
 	m_hwnd = CreateWindowEx(WS_EX_APPWINDOW, 
-							m_appName, 
-							m_appName, 
-							WS_OVERLAPPEDWINDOW,
-							posX, posY,
-							width, height,
-							NULL, NULL, 
-							m_hinstance,
-							NULL);
+									m_appName, 
+									m_appName, 
+									WS_OVERLAPPED,
+									posX,posY,
+									width, height,
+									NULL, NULL, 
+									m_hinstance,
+									NULL);
 	if(m_hwnd == NULL)
 	{
-		return;
-	}
+		return false;
+	} // done with window "refresh" 
 
-	result = m_openGL->InitializeOGL(m_hwnd, width, height, SCREEN_DEPTH, SCREEN_NEAR, VSYNC_ENABLED);
+	result = m_openGL->InitializeOGL(m_hwnd, width, height, SCREEN_DEPTH, SCREEN_NEAR, VSYNC_ENABLED); // Set up open GL (Use OGL) 
 	if(!result)
 	{
 		MessageBox(m_hwnd, _T("Could Not Initialize OpenGL, check OpenGL 4.0 support"), _T("It didn't work"), MB_OK);
-		return;
+		return false;
 	}
+
+	MessageBox(m_hwnd, _T("Complete"), _T("Paint+"), MB_OK);
 
 	ShowWindow(m_hwnd, SW_SHOW);
 	SetForegroundWindow(m_hwnd);
@@ -151,7 +215,7 @@ void Framework::InitializeWindows(int& width, int& height)
 	
 	ShowCursor(true);
 	
-	return;	
+	return true;	
 }
 
 void Framework::ShutdownWindows()
@@ -181,6 +245,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wparam, LPARAM lparam)
 		case WM_CLOSE:
 		{
 			PostQuitMessage(0);
+			return 0;
 		}
 		default:
 		{

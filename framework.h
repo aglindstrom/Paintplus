@@ -12,6 +12,7 @@
 #include <string.h>
 #include <tchar.h>
 #include <windows.h>
+#include <fstream>
 
 class Framework
 {
@@ -20,7 +21,7 @@ class Framework
 		Framework(const Framework&);
 		~Framework();
 		
-		bool Initialize();
+		bool Initialize(std::ofstream*);
 		void Shutdown();
 		void Run();
 		
@@ -28,7 +29,7 @@ class Framework
 		
 	private:
 		bool Frame();
-		bool InitializeWindows(OGL*, int&, int&);
+		bool InitializeWindows(OGL*, int&, int&, std::ofstream*);
 		void ShutdownWindows();
 		
 		inputDevice* keyboard_mouse;

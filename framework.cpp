@@ -15,7 +15,7 @@ Framework::~Framework()
 
 }
 
-bool Framework::Initialize()
+bool Framework::Initialize(std::ofstream* errorOut)
 {
 	int width, height;
 	bool result = true;
@@ -31,21 +31,21 @@ bool Framework::Initialize()
 		return false;
 	}
 
+	m_openGL = new OGL;
+	if (!m_openGL)
+	{
+		return false;
+	}
+
+	InitializeWindows(m_openGL, width, height, errorOut);
+
 	m_output = new output;
 	result = m_output->Initialize(m_openGL, m_hwnd);
-	if(!result)
+	if (!result)
 	{
 		MessageBox(m_hwnd, _T("output failed"), _T("it didn't work"), MB_OK);
 		return false;
 	}
-
-	m_openGL = new OGL;
-	if(!m_openGL)
-	{
-		return false;
-	}
-
-	InitializeWindows(m_openGL, width, height);
 
 	return true;
 }
@@ -96,14 +96,12 @@ void Framework::Run()
 
 		if(msg.message == WM_QUIT)
 		{
-			MessageBox(m_hwnd, _T("Quitting"), _T("ERROR"), MB_OK);
 			done = true;
 		}
 		else
 		{
-			if(Frame())
+			if(!Frame())
 			{
-				MessageBox(m_hwnd, _T("Bad Render"), _T("ERROR"), MB_OK);
 				done = true;
 			}
 		}
@@ -126,7 +124,7 @@ bool Framework::Frame()
 	return true;
 }
 
-bool Framework::InitializeWindows(OGL* openGL, int& width, int& height) // Craft a window with open gl interface
+bool Framework::InitializeWindows(OGL* openGL, int& width, int& height, std::ofstream* errorOut) // Craft a window with open gl interface
 {
 	WNDCLASSEX wcex;
 	int posX, posY;
@@ -151,12 +149,11 @@ bool Framework::InitializeWindows(OGL* openGL, int& width, int& height) // Craft
 	wcex.lpszClassName		= m_appName;
 	wcex.hIconSm			= wcex.hIcon;
 	
-	if(!RegisterClassEx(&wcex))
+	result = RegisterClassEx(&wcex);
+	if(!result)
 	{
    		return false;
 	}
-	
-	MessageBox(m_hwnd, _T("Creating Window"), _T("it didn't work"), MB_OK);
 
 	m_hwnd = CreateWindowEx(WS_EX_APPWINDOW, 
 									m_appName, 
@@ -167,21 +164,18 @@ bool Framework::InitializeWindows(OGL* openGL, int& width, int& height) // Craft
 									NULL, NULL, 
 									m_hinstance,
 									NULL);
-									
-	ShowWindow(m_hwnd, SW_SHOW);
+	*errorOut << "first" << GetLastError() << std::endl;
+	ShowWindow(m_hwnd, SW_HIDE);
 
-	result = openGL->InitializeExtensions(m_hwnd); // Set up the open GL Extensions (tells the computer how to use OGL)
-	if(!result)
+	result = m_openGL->InitializeExtensions(m_hwnd); // Set up the open GL Extensions (tells the computer how to use OGL)
+	if(!result) // just in case the set up didn't work
 	{
 		MessageBox(m_hwnd, _T("Could not Initialize OpenGL extensions"), _T("It didn't work"), MB_OK);
 		return false;
 	}
 
-	DestroyWindow(m_hwnd); // Open GL Extensions initialized "refreshing" window
-	//m_hwnd = NULL;
-
-	width = 800;
-	height = 600;
+	width = GetSystemMetrics(SM_CXSCREEN);
+	height = GetSystemMetrics(SM_CYSCREEN);
 
 	posX = 0;
 	posY = 0;
@@ -189,16 +183,17 @@ bool Framework::InitializeWindows(OGL* openGL, int& width, int& height) // Craft
 	m_hwnd = CreateWindowEx(WS_EX_APPWINDOW, 
 									m_appName, 
 									m_appName, 
-									WS_OVERLAPPED,
+									WS_POPUP,
 									posX,posY,
 									width, height,
 									NULL, NULL, 
 									m_hinstance,
 									NULL);
-	if(m_hwnd == NULL)
+	*errorOut << "second" << GetLastError() << std::endl;
+	if(!m_hwnd)
 	{
 		return false;
-	} // done with window "refresh" 
+	} // recreate window to begin OGL Initialization
 
 	result = m_openGL->InitializeOGL(m_hwnd, width, height, SCREEN_DEPTH, SCREEN_NEAR, VSYNC_ENABLED); // Set up open GL (Use OGL) 
 	if(!result)
@@ -207,13 +202,14 @@ bool Framework::InitializeWindows(OGL* openGL, int& width, int& height) // Craft
 		return false;
 	}
 
-	MessageBox(m_hwnd, _T("Complete"), _T("Paint+"), MB_OK);
+
 
 	ShowWindow(m_hwnd, SW_SHOW);
+	*errorOut << "third" << GetLastError() << std::endl;
 	SetForegroundWindow(m_hwnd);
-	SetFocus(m_hwnd);
-	
-	ShowCursor(true);
+	*errorOut << "fourth" << GetLastError() << std::endl;
+	//SetFocus(m_hwnd);
+	*errorOut << "fifth" << GetLastError() << std::endl;
 	
 	return true;	
 }

@@ -14,7 +14,7 @@ class inputDevice
 		void KeyDown(unsigned int);
 		void KeyUp(unsigned int);
 		bool IsKeyDown(unsigned int);
-		void GetMouseLoc(int&, int&, HWND);
+		void GetMouseLoc(int&, int&);
 		
 	private:
 		bool m_keys[256];

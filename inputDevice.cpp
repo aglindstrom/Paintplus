@@ -42,7 +42,7 @@ bool inputDevice::IsKeyDown(unsigned int input)
 	return m_keys[input];
 }
 
-void inputDevice::GetMouseLoc(int& _x, int& _y, HWND hWnd)
+void inputDevice::GetMouseLoc(int& _x, int& _y)
 {
 	POINT p;
 	if(GetCursorPos(&p))

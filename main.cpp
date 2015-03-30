@@ -19,7 +19,7 @@ int WINAPI WinMain(HINSTANCE hInstance,
 		return 0;
 	}
 	
-	result = framework_Inst->Initialize();
+	result = framework_Inst->Initialize(&fout);
 	if(result)
 	{
 		fout << "It Worked!";

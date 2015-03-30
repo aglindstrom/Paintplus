@@ -62,10 +62,12 @@ bool OGL::InitializeExtensions(HWND hwnd)
 		return false;
 	}
 
+	// release un needed temporary render context
 	wglMakeCurrent(NULL, NULL);
 	wglDeleteContext(renderContext);
 	renderContext = NULL;
 
+	// release unneeded temporary device context
 	ReleaseDC(hwnd, deviceContext);
 	deviceContext = 0;
 
@@ -86,8 +88,11 @@ bool OGL::InitializeOGL(HWND hwnd, int width, int height, float screenDepth, flo
 	m_deviceContext = GetDC(hwnd);
 	if(!m_deviceContext)
 	{
+		MessageBox(hwnd, _T("device Context Failed"), _T("Error"), MB_OK);
 		return false;
 	}
+
+	MessageBox(hwnd, _T("device Context Succeeded"), _T("Success"), MB_OK);
 
 	attribListInt[0] = WGL_SUPPORT_OPENGL_ARB;
 	attribListInt[1] = TRUE;
@@ -528,7 +533,7 @@ void OGL::GetProjectionMatrix(float* matrix)
 
 void OGL::GetVideoCardInfo(char* cardName)
 {
-	strcpy_s(cardName,128, m_videoCardDescription);
+	strcpy_s(cardName, 128, m_videoCardDescription);
 	return;
 }
 

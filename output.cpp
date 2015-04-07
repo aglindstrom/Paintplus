@@ -3,6 +3,9 @@
 output::output()
 {
 	m_openGL = 0;
+	m_shader = 0;
+	m_camera = 0;
+	m_model = 0;
 }
 
 output::output(const output& other)
@@ -18,6 +21,36 @@ output::~output()
 bool output::Initialize(OGL* ogl, HWND hwnd)
 {
 	m_openGL = ogl;
+
+	m_camera = new Camera;
+	if (!m_camera)
+	{
+		return false;
+	}
+
+	m_camera->SetPosition(0.0f, 0.0f, -10.0f);
+
+	m_model = new Model;
+	if (!m_model)
+	{
+		return false;
+	}
+
+	if (!m_model->Initialize(m_openGL))
+	{
+		return false;
+	}
+
+	m_shader = new ColorShader;
+	if (!m_shader)
+	{
+		return false;
+	}
+
+	if (!m_shader->Initialize(m_openGL, hwnd))
+	{
+		return false;
+	}
 
 	return true;
 }
@@ -42,8 +75,22 @@ void output::Shutdown()
 
 bool output::Render()
 {
+	float worldMatrix[16];
+	float viewMatrix[16];
+	float projectionMatrix[16];
+
 	m_openGL->BeginScene(0.5f,0.5f,0.5f,1.0f);
 
+	m_camera->Render();
+
+	m_openGL->GetWorldMatrix(worldMatrix);
+	m_camera->GetViewMatrix(viewMatrix);
+	m_openGL->GetProjectionMatrix(projectionMatrix);
+
+	m_shader->SetShader(m_openGL);
+	m_shader->SetShaderParameters(m_openGL, worldMatrix, viewMatrix, projectionMatrix);
+
+	m_model->Render(m_openGL);
 
 	m_openGL->EndScene();
 

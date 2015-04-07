@@ -20,7 +20,7 @@ class ColorShader
 		bool InitializeShader(char*, char*, OGL*, HWND);
 		char* LoadShaderSourceFile(char*);
 		void OutputShaderErrorMessage(OGL*, HWND, unsigned int, char*);
-		void OutputLinkerErrorMessage(OGL*, HWND, unsigned int, char*);
+		void OutputLinkerErrorMessage(OGL*, HWND, unsigned int);
 		void ShutdownShader(OGL*);
 
 		unsigned int m_vertexShader;

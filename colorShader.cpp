@@ -52,27 +52,27 @@ bool ColorShader::InitializeShader(char* vertexShader, char* pixelShader, OGL* o
 
 	openGL->glShaderSource(m_vertexShader, 1, &vertexShaderBuffer, NULL);
 	openGL->glShaderSource(m_pixelShader, 1, &pixelShaderBuffer, NULL);
-
+	
 	delete[] vertexShaderBuffer;
 	vertexShaderBuffer = 0;
 
 	delete[] pixelShaderBuffer;
 	pixelShaderBuffer = 0;
-
+	
 	openGL->glCompileShader(m_vertexShader);
 	openGL->glCompileShader(m_pixelShader);
 
 	openGL->glGetShaderIV(m_vertexShader, GL_COMPILE_STATUS, &status);
 	if (status != 1)
 	{
-		OutputShaderErrorMessage(openGL, hwnd, vertexShader);
+		OutputShaderErrorMessage(openGL, hwnd, m_vertexShader, vertexShader);
 		return false;
 	}
 
 	openGL->glGetShaderIV(m_pixelShader, GL_COMPILE_STATUS, &status);
 	if (status != 1)
 	{
-		OutputShaderErrorMessage(openGL, hwnd, pixelShader);
+		OutputShaderErrorMessage(openGL, hwnd, m_pixelShader, pixelShader);
 		return false;
 	}
 
@@ -81,7 +81,7 @@ bool ColorShader::InitializeShader(char* vertexShader, char* pixelShader, OGL* o
 	openGL->glAttachShader(m_shaderProgram, m_vertexShader);
 	openGL->glAttachShader(m_shaderProgram, m_pixelShader);
 
-	openGL->glBindAttribLocation(m_shaderProgram, 0, "inputPos");
+	openGL->glBindAttribLocation(m_shaderProgram, 0, "inputPosition");
 	openGL->glBindAttribLocation(m_shaderProgram, 1, "inputColor");
 
 	openGL->glLinkProgram(m_shaderProgram);
@@ -89,7 +89,7 @@ bool ColorShader::InitializeShader(char* vertexShader, char* pixelShader, OGL* o
 	openGL->glGetProgramIV(m_shaderProgram, GL_LINK_STATUS, &status);
 	if (status != 1)
 	{
-		OutputLinkerErrorMessage(openGL, hwnd, shaderProgram);
+		OutputLinkerErrorMessage(openGL, hwnd, m_shaderProgram);
 		return false;
 	}
 
@@ -106,7 +106,7 @@ void ColorShader::Shutdown(OGL* openGL)
 char* ColorShader::LoadShaderSourceFile(char* filename)
 {
 	std::ifstream fin;
-	int fileSize;
+	int fileSize = 0;
 	char input;
 	char* buffer;
 
@@ -117,8 +117,6 @@ char* ColorShader::LoadShaderSourceFile(char* filename)
 		return 0;
 	}
 
-	fileSize = 0;
-
 	fin.get(input);
 
 	while (!fin.eof())
@@ -127,6 +125,16 @@ char* ColorShader::LoadShaderSourceFile(char* filename)
 		fin.get(input);
 	}
 
+	fin.close();
+
+	buffer = new char[fileSize + 1];
+	if (!buffer)
+	{
+		return false;
+	}
+
+	fin.open(filename);
+	fin.read(buffer, fileSize);
 	fin.close();
 
 	buffer[fileSize] = '\0';
@@ -170,13 +178,13 @@ void ColorShader::OutputShaderErrorMessage(OGL* openGL, HWND hwnd, unsigned int 
 		return;
 	}
 
-	MessageBox(hwnd, "Error compiling shader. Check shader-error.txt.", "compile Error", MB_OK);
+	MessageBox(hwnd, _T("Error compiling shader. Check shader-error.txt."), _T(fileName), MB_OK);
 
 	return;
 
 }
 
-void ColorShader::OutputLinkerErrorMessage(OGL* openGL, HWND hwnd, unsigned int programId, char* fileName)
+void ColorShader::OutputLinkerErrorMessage(OGL* openGL, HWND hwnd, unsigned int programId)
 {
 	int logSize, i; 
 	char* infoLog;
@@ -220,6 +228,11 @@ void ColorShader::ShutdownShader(OGL* openGL)
 	openGL->glDeleteProgram(m_shaderProgram);
 
 	return;
+}
+
+void ColorShader::SetShader(OGL* openGL)
+{
+	openGL->glUseProgram(m_shaderProgram);
 }
 
 bool ColorShader::SetShaderParameters(OGL* openGL, float* worldMatrix, float* viewMatrix, float* projectionMatrix)

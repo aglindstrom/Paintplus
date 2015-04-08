@@ -124,11 +124,11 @@ void Camera::BuildViewMatrix(Vector position, Vector lookAt, Vector up)
 	yAxis.y = (zAxis.z * xAxis.x) - (zAxis.x * xAxis.z);
 	yAxis.z = (zAxis.x * xAxis.y) - (zAxis.y * xAxis.x);
 
-	result1 = ((xAxis.x * position.x) + (xAxis.y * position.y) + (xAxis.z * position.z) * -1.0f);
+	result1 = ((xAxis.x * position.x) + (xAxis.y * position.y) + (xAxis.z * position.z)) * -1.0f;
 
-	result2 = ((yAxis.x * position.x) + (yAxis.y * position.y) + (yAxis.z * position.z) * -1.0f);
+	result2 = ((yAxis.x * position.x) + (yAxis.y * position.y) + (yAxis.z * position.z)) * -1.0f;
 
-	result3 = ((zAxis.x * position.x) + (zAxis.y * position.y) + (zAxis.z * position.z) * -1.0f);
+	result3 = ((zAxis.x * position.x) + (zAxis.y * position.y) + (zAxis.z * position.z)) * -1.0f;
 	
 	m_viewMatrix[0] = xAxis.x;
 	m_viewMatrix[1] = yAxis.x;

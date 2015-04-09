@@ -577,12 +577,12 @@ void OGL::BuildPerspectiveFovLHMatrix(float* matrix, float FOV, float Aspect, fl
 	matrix[8] = 0.0f;
 	matrix[9] = 0.0f;
 	matrix[10] = screenDepth/(screenDepth-screenNear);
-	matrix[11] = 0.0f;
+	matrix[11] = 1.0f;
 
 	matrix[12] = 0.0f;
 	matrix[13] = 0.0f;
-	matrix[14] = 0.0f;
-	matrix[15] = (-screenNear*screenDepth)/(screenDepth-screenNear);
+	matrix[14] = (-screenNear*screenDepth) / (screenDepth - screenNear);
+	matrix[15] = 0.0f;
 
 	return;
 }

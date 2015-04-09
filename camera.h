@@ -6,7 +6,7 @@
 class Camera
 {
 	private:
-		struct Vector
+		struct VectorType
 		{
 			float x, y, z;
 		};
@@ -24,8 +24,8 @@ class Camera
 
 	private:
 		void MatrixRotationYawPitchRoll(float*, float, float, float);
-		void TransformCoord(Vector&, float*);
-		void BuildViewMatrix(Vector, Vector, Vector);
+		void TransformCoord(VectorType&, float*);
+		void BuildViewMatrix(VectorType, VectorType, VectorType);
 
 		float m_posX, m_posY, m_posZ;
 		float m_rotX, m_rotY, m_rotZ;

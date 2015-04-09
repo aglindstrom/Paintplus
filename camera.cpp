@@ -98,6 +98,7 @@ void Camera::MatrixRotationYawPitchRoll(float* matrix, float yaw, float pitch, f
 	matrix[7] = -sPitch;
 	matrix[8] = (cPitch * cYaw);
 
+
 	return;
 }
 

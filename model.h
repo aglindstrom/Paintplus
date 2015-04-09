@@ -6,7 +6,7 @@
 class Model
 {
 	private:
-		struct Vertex
+		struct VertexType
 		{
 			float x, y, z;
 			float r, g, b;

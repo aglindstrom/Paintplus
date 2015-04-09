@@ -44,13 +44,13 @@ void Model::Render(OGL* openGL)
 
 bool Model::InitializeBuffers(OGL* openGL)
 {
-	Vertex* vertices;
+	VertexType* vertices;
 	unsigned int* indices;
 
 	m_vertexCount = 3;
 	m_indexCount = 3;
 
-	vertices = new Vertex[m_vertexCount];
+	vertices = new VertexType[m_vertexCount];
 	if (!vertices)
 	{
 		return false;
@@ -105,21 +105,21 @@ bool Model::InitializeBuffers(OGL* openGL)
 	openGL->glGenBuffers(1, &m_vertexBufferId);
 
 	openGL->glBindBuffer(GL_ARRAY_BUFFER, m_vertexBufferId);
-	openGL->glBufferData(GL_ARRAY_BUFFER, m_vertexCount * sizeof(Vertex), vertices, GL_STATIC_DRAW);
+	openGL->glBufferData(GL_ARRAY_BUFFER, m_vertexCount * sizeof(VertexType), vertices, GL_STATIC_DRAW);
 
 	openGL->glEnableVertexAttribArray(0);
 	openGL->glEnableVertexAttribArray(1);
 
 	openGL->glBindBuffer(GL_ARRAY_BUFFER, m_vertexBufferId);
-	openGL->glVertexAttribPointer(0, 3, GL_FLOAT, false, sizeof(Vertex), 0);
+	openGL->glVertexAttribPointer(0, 3, GL_FLOAT, false, sizeof(VertexType), 0);
 
 	openGL->glBindBuffer(GL_ARRAY_BUFFER, m_vertexBufferId);
-	openGL->glVertexAttribPointer(1, 3, GL_FLOAT, false, sizeof(Vertex), (unsigned char*)NULL + (3 * sizeof(float)));
+	openGL->glVertexAttribPointer(1, 3, GL_FLOAT, false, sizeof(VertexType), (unsigned char*)NULL + (3 * sizeof(float)));
 
 	openGL->glGenBuffers(1, &m_indexBufferId);
 
 	openGL->glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indexBufferId);
-	openGL->glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_indexBufferId*sizeof(unsigned int), indices, GL_STATIC_DRAW);
+	openGL->glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_indexCount*sizeof(unsigned int), indices, GL_STATIC_DRAW);
 
 	delete[] vertices;
 	vertices = 0;

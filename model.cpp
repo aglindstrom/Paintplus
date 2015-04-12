@@ -2,7 +2,7 @@
 
 Model::Model()
 {
-
+	m_Texture = 0;
 }
 
 Model::Model(const Model& other)
@@ -15,7 +15,7 @@ Model::~Model()
 
 }
 
-bool Model::Initialize(OGL* openGL)
+bool Model::Initialize(OGL* openGL, char* texFileName, unsigned int texUnit, bool wrap)
 {
 	bool result;
 
@@ -25,11 +25,20 @@ bool Model::Initialize(OGL* openGL)
 		return false;
 	}
 
+	result = LoadTexture(openGL, texFileName, texUnit, wrap);
+	if (!result)
+	{
+		return false;
+	}
+
+
 	return true;
 }
 
 void Model::Shutdown(OGL* openGL)
 {
+	ReleaseTexture();
+
 	ShutdownBuffers(openGL);
 
 	return;
@@ -47,8 +56,8 @@ bool Model::InitializeBuffers(OGL* openGL)
 	VertexType* vertices;
 	unsigned int* indices;
 
-	m_vertexCount = 3;
-	m_indexCount = 3;
+	m_vertexCount = 4;
+	m_indexCount = 6;
 
 	vertices = new VertexType[m_vertexCount];
 	if (!vertices)
@@ -63,40 +72,39 @@ bool Model::InitializeBuffers(OGL* openGL)
 	}
 
 	vertices[0].x = -1.0f;
-	vertices[0].y = -1.0f;
+	vertices[0].y = 1.0f;
 	vertices[0].z = 0.0f;
 
-	vertices[0].r = 0.0f;
-	vertices[0].g = 1.0f;
-	vertices[0].b = 0.0f;
+	vertices[0].tu = 0.0f;
+	vertices[0].tv = 0.0f;
 
-	vertices[1].x = 0.0f;
+	vertices[1].x = 1.0f;
 	vertices[1].y = 1.0f;
 	vertices[1].z = 0.0f;
 
-	vertices[1].r = 0.0f;
-	vertices[1].g = 1.0f;
-	vertices[1].b = 0.0f;
+	vertices[1].tu = 1.0f;
+	vertices[1].tv = 0.0f;
 
 	vertices[2].x = 1.0f;
 	vertices[2].y = -1.0f;
 	vertices[2].z = 0.0f;
 
-	vertices[2].r = 0.0f;
-	vertices[2].g = 1.0f;
-	vertices[2].b = 0.0f;
+	vertices[2].tu = 1.0f;
+	vertices[2].tv = 1.0f;
 
-/*	vertices[3].x = 1.0f;
-	vertices[3].y = 0.0f;
+	vertices[3].x = -1.0f;
+	vertices[3].y = -1.0f;
 	vertices[3].z = 0.0f;
-	vertices[3].r = 0.0f;
-	vertices[3].g = 0.0f;
-	vertices[3].b = 0.0f;
-*/
+	
+	vertices[3].tu = 0.0f;
+	vertices[3].tv = 1.0f;
+
 	indices[0] = 0;
 	indices[1] = 1;
 	indices[2] = 2;
-	//indices[3] = 3;
+	indices[3] = 0;
+	indices[4] = 2;
+	indices[5] = 3;
 
 	openGL->glGenVertexArrays(1, &m_vertexArrayId);
 
@@ -114,7 +122,7 @@ bool Model::InitializeBuffers(OGL* openGL)
 	openGL->glVertexAttribPointer(0, 3, GL_FLOAT, false, sizeof(VertexType), 0);
 
 	openGL->glBindBuffer(GL_ARRAY_BUFFER, m_vertexBufferId);
-	openGL->glVertexAttribPointer(1, 3, GL_FLOAT, false, sizeof(VertexType), (unsigned char*)NULL + (3 * sizeof(float)));
+	openGL->glVertexAttribPointer(1, 2, GL_FLOAT, false, sizeof(VertexType), (unsigned char*)NULL + (3 * sizeof(float)));
 
 	openGL->glGenBuffers(1, &m_indexBufferId);
 
@@ -152,5 +160,35 @@ void Model::RenderBuffers(OGL* openGL)
 
 	glDrawElements(GL_TRIANGLES, m_indexCount, GL_UNSIGNED_INT, 0);
 	
+	return;
+}
+
+bool Model::LoadTexture(OGL* openGL, char* fileName, unsigned int texUnit, bool wrap)
+{
+	bool result;
+
+	m_Texture = new TextureClass;
+	if (!m_Texture)
+	{
+		return false;
+	}
+
+	result = m_Texture->Initialize(openGL, fileName, texUnit, wrap);
+	if (!result)
+	{
+		return false;
+	}
+
+	return true;
+}
+
+void Model::ReleaseTexture()
+{
+	if (m_Texture)
+	{
+		m_Texture->Shutdown();
+		delete m_Texture;
+		m_Texture = 0;
+	}
 	return;
 }

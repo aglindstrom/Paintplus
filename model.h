@@ -2,6 +2,7 @@
 #define _MODEL_H_
 
 #include "ogl.h"
+#include "texture.h"
 
 class Model
 {
@@ -9,7 +10,8 @@ class Model
 		struct VertexType
 		{
 			float x, y, z;
-			float r, g, b;
+			//float r, g, b;
+			float tu, tv;
 		};
 
 	public:
@@ -17,7 +19,7 @@ class Model
 		Model(const Model&);
 		~Model();
 
-		bool Initialize(OGL*);
+		bool Initialize(OGL*, char*, unsigned int, bool);
 		void Shutdown(OGL*);
 		void Render(OGL*);
 
@@ -25,9 +27,12 @@ class Model
 		bool InitializeBuffers(OGL*);
 		void ShutdownBuffers(OGL*);
 		void RenderBuffers(OGL*);
+		bool LoadTexture(OGL*, char*, unsigned int, bool);
+		void ReleaseTexture();
 
 		int m_vertexCount, m_indexCount;
 		unsigned int m_vertexArrayId, m_vertexBufferId, m_indexBufferId;
+		TextureClass* m_Texture;
 };
 
 

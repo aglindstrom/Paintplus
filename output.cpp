@@ -3,9 +3,10 @@
 output::output()
 {
 	m_openGL = 0;
-	m_shader = 0;
+	//m_shader = 0;
 	m_camera = 0;
 	m_model = 0;
+	m_TextureShader = 0;
 }
 
 output::output(const output& other)
@@ -36,11 +37,23 @@ bool output::Initialize(OGL* ogl, HWND hwnd)
 		return false;
 	}
 
-	if (!m_model->Initialize(m_openGL))
+	if (!m_model->Initialize(m_openGL, "test.tga", 0, true))
 	{
 		return false;
 	}
 
+	m_TextureShader = new TextureShader;
+	if (!m_TextureShader)
+	{
+		return false;
+	}
+
+	if (!m_TextureShader->Initialize(m_openGL, hwnd))
+	{
+		MessageBox(hwnd, L"Could Not init Tex Shader", L"Error", MB_OK);
+		return false;
+	}
+	/*
 	m_shader = new ColorShader;
 	if (!m_shader)
 	{
@@ -51,7 +64,7 @@ bool output::Initialize(OGL* ogl, HWND hwnd)
 	{
 		return false;
 	}
-
+	*/
 	return true;
 }
 
@@ -87,8 +100,8 @@ bool output::Render()
 	m_camera->GetViewMatrix(viewMatrix);
 	m_openGL->GetProjectionMatrix(projectionMatrix);
 
-	m_shader->SetShader(m_openGL);
-	m_shader->SetShaderParameters(m_openGL, worldMatrix, viewMatrix, projectionMatrix);
+	m_TextureShader->SetShader(m_openGL);
+	m_TextureShader->SetShaderParameters(m_openGL, worldMatrix, viewMatrix, projectionMatrix, 0);
 
 	m_model->Render(m_openGL);
 

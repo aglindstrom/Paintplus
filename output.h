@@ -5,6 +5,7 @@
 #include "camera.h"
 #include "model.h"
 #include "colorShader.h"
+#include "textureshader.h"
 
 const float SCREEN_DEPTH = 1000.0f;
 const float SCREEN_NEAR = 0.1f;
@@ -27,7 +28,8 @@ class output
 		OGL* m_openGL;
 		Camera* m_camera;
 		Model* m_model;
-		ColorShader* m_shader;
+		//ColorShader* m_shader;
+		TextureShader* m_TextureShader;
 };
 
 #endif

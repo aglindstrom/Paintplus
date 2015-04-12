@@ -178,7 +178,7 @@ void ColorShader::OutputShaderErrorMessage(OGL* openGL, HWND hwnd, unsigned int 
 		return;
 	}
 
-	MessageBox(hwnd, _T("Error compiling shader. Check shader-error.txt."), _T(fileName), MB_OK);
+	MessageBox(hwnd, _T("Error compiling shader. Check shader-error.txt."), _T("shader Error"), MB_OK);
 
 	return;
 
@@ -211,7 +211,7 @@ void ColorShader::OutputLinkerErrorMessage(OGL* openGL, HWND hwnd, unsigned int 
 
 	fout.close();
 
-	MessageBox(hwnd, "Error compiling linker. Check linker-error.txt for message.", "Linker Error", MB_OK);
+	MessageBox(hwnd, _T("Error compiling linker. Check linker-error.txt for message."), _T("Linker Error"), MB_OK);
 
 	return;
 }

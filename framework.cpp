@@ -134,7 +134,7 @@ bool Framework::InitializeWindows(OGL* openGL, int& width, int& height, std::ofs
 	
 	m_hinstance = GetModuleHandle(NULL);
 	
-	m_appName = "Paint+";
+	m_appName = L"Paint+";
 	
 	wcex.cbSize 			= sizeof(WNDCLASSEX);
 	wcex.style 				= CS_HREDRAW|CS_VREDRAW|CS_OWNDC;

@@ -37,7 +37,7 @@ void TextureShader::Shutdown(OGL* openGL)
 
 void TextureShader::SetShader(OGL* openGL)
 {
-	openGL->glUseProgram(m_vertexShader);
+	openGL->glUseProgram(m_shaderProgram);
 
 	return;
 }
@@ -183,7 +183,7 @@ void TextureShader::OutputShaderErrorMessage(OGL* openGL, HWND hwnd, unsigned in
 		return;
 	}
 
-	MessageBox(hwnd, _T("Error compiling shader. Check shader-error.txt."), newString, MB_OK);
+	MessageBox(hwnd, _T("Error compiling shader. Check shader-error.txt."), fileName, MB_OK);
 
 	return;
 

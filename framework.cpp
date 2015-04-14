@@ -134,7 +134,7 @@ bool Framework::InitializeWindows(OGL* openGL, int& width, int& height, std::ofs
 	
 	m_hinstance = GetModuleHandle(NULL);
 	
-	m_appName = L"Paint+";
+	m_appName = "Paint+";
 	
 	wcex.cbSize 			= sizeof(WNDCLASSEX);
 	wcex.style 				= CS_HREDRAW|CS_VREDRAW|CS_OWNDC;
@@ -177,6 +177,11 @@ bool Framework::InitializeWindows(OGL* openGL, int& width, int& height, std::ofs
 	width = GetSystemMetrics(SM_CXSCREEN);
 	height = GetSystemMetrics(SM_CYSCREEN);
 
+	DestroyWindow(m_hwnd);
+	m_hwnd = 0;
+
+	PeekMessage(NULL, m_hwnd, 0, 0, PM_REMOVE);
+
 	posX = 0;
 	posY = 0;
 
@@ -208,7 +213,7 @@ bool Framework::InitializeWindows(OGL* openGL, int& width, int& height, std::ofs
 	*errorOut << "third" << GetLastError() << std::endl;
 	SetForegroundWindow(m_hwnd);
 	*errorOut << "fourth" << GetLastError() << std::endl;
-	//SetFocus(m_hwnd);
+	SetFocus(m_hwnd);
 	*errorOut << "fifth" << GetLastError() << std::endl;
 	
 	return true;	

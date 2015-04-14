@@ -74,6 +74,122 @@ bool OGL::InitializeExtensions(HWND hwnd)
 	return true;
 }
 
+bool OGL::InitializeOrtho(HWND hwnd, int width, int height, float screenDepth, float screenNear, bool vSync)
+{
+	int attribListInt[19];
+	int pixelFormat[1];
+	unsigned int formatCount;
+	int result;
+	PIXELFORMATDESCRIPTOR pixelFormatDescriptor;
+	int attribList[5];
+	char *vendorString, *renderString;
+
+	m_deviceContext = GetDC(hwnd);
+	if (!m_deviceContext)
+	{
+		MessageBox(hwnd, _T("device Context Failed"), _T("Error"), MB_OK);
+		return false;
+	}
+
+	MessageBox(hwnd, _T("device Context Succeeded"), _T("Success"), MB_OK);
+
+	attribListInt[0] = WGL_SUPPORT_OPENGL_ARB;
+	attribListInt[1] = TRUE;
+
+	attribListInt[2] = WGL_DRAW_TO_WINDOW_ARB;
+	attribListInt[3] = TRUE;
+
+	attribListInt[4] = WGL_ACCELERATION_ARB;
+	attribListInt[5] = WGL_FULL_ACCELERATION_ARB;
+
+	attribListInt[6] = WGL_COLOR_BITS_ARB;
+	attribListInt[7] = 24;
+
+	attribListInt[8] = WGL_DEPTH_BITS_ARB;
+	attribListInt[9] = 24;
+
+	attribListInt[10] = WGL_DOUBLE_BUFFER_ARB;
+	attribListInt[11] = TRUE;
+
+	attribListInt[12] = WGL_SWAP_METHOD_ARB;
+	attribListInt[13] = WGL_SWAP_EXCHANGE_ARB;
+
+	attribListInt[14] = WGL_PIXEL_TYPE_ARB;
+	attribListInt[15] = WGL_TYPE_RGBA_ARB;
+
+	attribListInt[16] = WGL_STENCIL_BITS_ARB;
+	attribListInt[17] = 8;
+
+	attribListInt[18] = 0;
+
+	result = wglChoosePixelFormatARB(m_deviceContext, attribListInt, NULL, 1, pixelFormat, &formatCount);
+	if (result != 1)
+	{
+		return false;
+	}
+
+	result = SetPixelFormat(m_deviceContext, pixelFormat[0], &pixelFormatDescriptor);
+	if (result != 1)
+	{
+		return false;
+	}
+
+	attribList[0] = WGL_CONTEXT_MAJOR_VERSION_ARB;
+	attribList[1] = 4;
+	attribList[2] = WGL_CONTEXT_MINOR_VERSION_ARB;
+	attribList[3] = 0;
+	attribList[4] = 0;
+
+	m_renderingContext = wglCreateContextAttribsARB(m_deviceContext, 0, attribList);
+	if (m_renderingContext == NULL)
+	{
+		return false;
+	}
+
+	result = wglMakeCurrent(m_deviceContext, m_renderingContext);
+	if (result != 1)
+	{
+		return false;
+	}
+
+
+	glClearDepth(1.0f);
+
+	glEnable(GL_DEPTH_TEST);
+
+	glFrontFace(GL_CW);
+
+	glEnable(GL_CULL_FACE);
+	glCullFace(GL_BACK);
+
+	BuildIdentityMatrix(m_worldMatrix);
+	
+	BuildOrthographicProjection(m_projectionMatrix, width, height, screenNear, screenDepth);
+
+	vendorString = (char*)glGetString(GL_VENDOR);
+	renderString = (char*)glGetString(GL_RENDERER);
+
+	strcpy_s(m_videoCardDescription, vendorString);
+	strcat_s(m_videoCardDescription, "-");
+	strcat_s(m_videoCardDescription, renderString);
+
+	if (vSync)
+	{
+		result = wglSwapIntervalEXT(1);
+	}
+	else
+	{
+		result = wglSwapIntervalEXT(0);
+	}
+
+	if (result != 1)
+	{
+		return false;
+	}
+
+
+}
+
 bool OGL::InitializeOGL(HWND hwnd, int width, int height, float screenDepth, float screenNear, bool vSync)
 {
 	int attribListInt[19];
@@ -534,6 +650,31 @@ void OGL::GetProjectionMatrix(float* matrix)
 void OGL::GetVideoCardInfo(char* cardName)
 {
 	strcpy_s(cardName, 128, m_videoCardDescription);
+	return;
+}
+
+void OGL::BuildOrthographicProjection(float* matrix, float width, float height, float screenNear, float screenDepth)
+{
+	matrix[0] = 1.0/width;
+	matrix[1] = 0.0f;
+	matrix[2] = 0.0f;
+	matrix[3] = 0.0f;
+
+	matrix[4] = 0.0f;
+	matrix[5] = 1.0f/height;
+	matrix[6] = 0.0f;
+	matrix[7] = 0.0f;
+
+	matrix[8] = 0.0f;
+	matrix[9] = 0.0f;
+	matrix[10] = -2/(screenDepth - screenNear);
+	matrix[11] = -(screenDepth + screenNear)/(screenDepth + screenNear);
+
+	matrix[12] = 0.0f;
+	matrix[13] = 0.0f;
+	matrix[14] = 0.0f;
+	matrix[15] = 1.0f;
+
 	return;
 }
 

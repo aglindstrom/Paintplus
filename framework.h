@@ -36,7 +36,7 @@ class Framework
 		output* m_output;
 		OGL* m_openGL;
 
-		LPCWSTR m_appName;
+		LPCSTR m_appName;
 		HINSTANCE m_hinstance;
 		HWND m_hwnd;
 };

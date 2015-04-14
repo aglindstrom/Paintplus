@@ -81,6 +81,7 @@ class OGL
 
 		bool InitializeExtensions(HWND);
 		bool InitializeOGL(HWND, int, int, float, float, bool);
+		bool InitializeOrtho(HWND, int, int, float, float, bool);
 		void Shutdown(HWND);
 
 		void BeginScene(float, float, float, float);
@@ -92,6 +93,7 @@ class OGL
 
 		void BuildIdentityMatrix(float*);
 		void BuildPerspectiveFovLHMatrix(float*, float, float, float, float);
+		void BuildOrthographicProjection(float*, float, float, float, float);
 		void MatrixRotationY(float*, float);
 		void MatrixTranslation(float*, float, float, float);
 		void MatrixMultiply(float*, float*, float*);

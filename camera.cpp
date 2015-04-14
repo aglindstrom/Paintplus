@@ -198,3 +198,12 @@ void Camera::GetViewMatrix(float* matrix)
 
 	return;
 }
+
+void Camera::Rotate(float x, float y, float z)
+{
+	m_rotX += x;
+	m_rotY += y;
+	m_rotZ += z;
+
+	return;
+}

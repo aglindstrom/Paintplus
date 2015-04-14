@@ -21,6 +21,7 @@ class Camera
 
 		void Render();
 		void GetViewMatrix(float*);
+		void Rotate(float, float, float);
 
 	private:
 		void MatrixRotationYawPitchRoll(float*, float, float, float);

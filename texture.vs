@@ -1,7 +1,7 @@
 #version 400
 
-in vec3 inputPosition;
-in vec2 inputTexCoord;
+layout(location = 0)in vec3 inputPosition;
+layout(location = 1)in vec2 inputTexCoord;
 
 out vec2 texCoord;
 

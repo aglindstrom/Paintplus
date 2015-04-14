@@ -15,9 +15,11 @@ Model::~Model()
 
 }
 
-bool Model::Initialize(OGL* openGL, char* texFileName, unsigned int texUnit, bool wrap)
+bool Model::Initialize(HWND hwnd, OGL* openGL, char* texFileName, unsigned int texUnit, bool wrap)
 {
 	bool result;
+	
+	m_hwnd = hwnd; 
 
 	result = InitializeBuffers(openGL);
 	if (!result)
@@ -62,42 +64,44 @@ bool Model::InitializeBuffers(OGL* openGL)
 	vertices = new VertexType[m_vertexCount];
 	if (!vertices)
 	{
+		MessageBox(m_hwnd, "Could Not allocate vertex", "Error", MB_OK);
 		return false;
 	}
 
 	indices = new unsigned int[m_indexCount];
 	if (!indices)
 	{
+		MessageBox(m_hwnd, "Could Not allocate index", "Error", MB_OK);
 		return false;
 	}
 
 	vertices[0].x = -1.0f;
-	vertices[0].y = 1.0f;
+	vertices[0].y = -1.0f;
 	vertices[0].z = 0.0f;
 
 	vertices[0].tu = 0.0f;
 	vertices[0].tv = 0.0f;
 
-	vertices[1].x = 1.0f;
+	vertices[1].x = -1.0f;
 	vertices[1].y = 1.0f;
 	vertices[1].z = 0.0f;
 
-	vertices[1].tu = 1.0f;
-	vertices[1].tv = 0.0f;
+	vertices[1].tu = 0.0f;
+	vertices[1].tv = 1.0f;
 
 	vertices[2].x = 1.0f;
-	vertices[2].y = -1.0f;
+	vertices[2].y = 1.0f;
 	vertices[2].z = 0.0f;
 
 	vertices[2].tu = 1.0f;
 	vertices[2].tv = 1.0f;
 
-	vertices[3].x = -1.0f;
+	vertices[3].x = 1.0f;
 	vertices[3].y = -1.0f;
 	vertices[3].z = 0.0f;
-	
-	vertices[3].tu = 0.0f;
-	vertices[3].tv = 1.0f;
+
+	vertices[3].tu = 1.0f;
+	vertices[3].tv = 0.0f;
 
 	indices[0] = 0;
 	indices[1] = 1;
@@ -127,7 +131,7 @@ bool Model::InitializeBuffers(OGL* openGL)
 	openGL->glGenBuffers(1, &m_indexBufferId);
 
 	openGL->glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indexBufferId);
-	openGL->glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_indexCount*sizeof(unsigned int), indices, GL_STATIC_DRAW);
+	openGL->glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_indexCount * sizeof(unsigned int), indices, GL_STATIC_DRAW);
 
 	delete[] vertices;
 	vertices = 0;
@@ -170,12 +174,14 @@ bool Model::LoadTexture(OGL* openGL, char* fileName, unsigned int texUnit, bool 
 	m_Texture = new TextureClass;
 	if (!m_Texture)
 	{
+		MessageBox(m_hwnd, "Could Not allocate Texture", "Error", MB_OK);
 		return false;
 	}
 
-	result = m_Texture->Initialize(openGL, fileName, texUnit, wrap);
+	result = m_Texture->Initialize(m_hwnd, openGL, fileName, texUnit, wrap);
 	if (!result)
 	{
+		MessageBox(m_hwnd, "Could Not init Texture", "Error", MB_OK);
 		return false;
 	}
 

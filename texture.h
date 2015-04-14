@@ -23,14 +23,17 @@ class TextureClass
 		TextureClass(const TextureClass&);
 		~TextureClass();
 
-		bool Initialize(OGL*, char*, unsigned int, bool);
+		bool Initialize(HWND, OGL*, char*, unsigned int, bool);
 		void Shutdown();
+		void ModifyTexture(OGL*, unsigned int);
 
 	private:
 		bool LoadTarga(OGL*, char*, unsigned int, bool);
 
 		bool loaded;
 		unsigned int m_textureID;
+		int m_width, m_height;
+		HWND m_hwnd;
 };
 
 #endif

@@ -19,7 +19,7 @@ class Model
 		Model(const Model&);
 		~Model();
 
-		bool Initialize(OGL*, char*, unsigned int, bool);
+		bool Initialize(HWND, OGL*, char*, unsigned int, bool);
 		void Shutdown(OGL*);
 		void Render(OGL*);
 
@@ -33,6 +33,7 @@ class Model
 		int m_vertexCount, m_indexCount;
 		unsigned int m_vertexArrayId, m_vertexBufferId, m_indexBufferId;
 		TextureClass* m_Texture;
+		HWND m_hwnd;
 };
 
 

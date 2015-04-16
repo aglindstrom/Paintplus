@@ -178,7 +178,14 @@ bool Model::LoadTexture(OGL* openGL, char* fileName, unsigned int texUnit, bool 
 		return false;
 	}
 
-	result = m_Texture->Initialize(m_hwnd, openGL, fileName, texUnit, wrap);
+	result = m_Texture->Initialize(m_hwnd, openGL, fileName, wrap);
+	if (!result)
+	{
+		MessageBox(m_hwnd, "Could Not init Texture", "Error", MB_OK);
+		return false;
+	}
+
+	result = m_Texture->addTexture(m_hwnd, openGL, fileName, wrap);
 	if (!result)
 	{
 		MessageBox(m_hwnd, "Could Not init Texture", "Error", MB_OK);

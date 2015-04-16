@@ -4,6 +4,7 @@
 #include <stdio.h>
 
 #include "ogl.h"
+#include "imageList.h"
 
 class TextureClass
 {
@@ -23,16 +24,19 @@ class TextureClass
 		TextureClass(const TextureClass&);
 		~TextureClass();
 
-		bool Initialize(HWND, OGL*, char*, unsigned int, bool);
+		bool Initialize(HWND, OGL*, char*, bool);
+		bool addTexture(HWND, OGL*, char*, bool);
 		void Shutdown();
-		void ModifyTexture(OGL*, unsigned int);
+		void ModifyTexture(OGL*, unsigned int, int, int);
 
 	private:
 		bool LoadTarga(OGL*, char*, unsigned int, bool);
+		void attatchImage(OGL*, int);
 
 		bool loaded;
 		unsigned int m_textureID;
 		int m_width, m_height;
+		Imagelist* m_images;
 		HWND m_hwnd;
 };
 

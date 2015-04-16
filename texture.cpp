@@ -15,18 +15,49 @@ TextureClass::~TextureClass()
 
 }
 
-bool TextureClass::Initialize(HWND hwnd, OGL* openGL, char* filename, unsigned int texUnit, bool wrap)
+bool TextureClass::Initialize(HWND hwnd, OGL* openGL, char* filename, bool wrap)
 {
 	bool result;
 
 	m_hwnd = hwnd;
 
-	result = LoadTarga(openGL, filename, texUnit, wrap);
+	m_images = new Imagelist;
+	if (!m_images)
+	{
+		return false;
+	}
+
+	result = m_images->Initialize(filename);
+	if (!result)
+	{
+		return false;
+	}
+
+	result = LoadTarga(openGL, filename, 0, wrap);
 	if (!result)
 	{
 		MessageBox(m_hwnd, "Could Not Load Targa", "Error", MB_OK);
 		return false;
 	}
+
+	attatchImage(openGL, 0);
+
+	return true;
+}
+
+bool TextureClass::addTexture(HWND hwnd, OGL* openGL, char* fileName, bool wrap)
+{
+	if (!m_images->addTexture(fileName))
+	{
+		return false;
+	}
+
+	if (!LoadTarga(openGL, fileName, m_images->getIndex() , wrap))
+	{
+		return false;
+	}
+
+	attatchImage(openGL, m_images->getIndex());
 
 	return true;
 }
@@ -75,7 +106,8 @@ bool TextureClass::LoadTarga(OGL* openGL, char* fileName, unsigned int texUnit, 
 
 	imageSize = width * height * 4;
 	targaImage = new unsigned char[imageSize];
-	if (!targaImage)
+	
+	if (!m_images->newImage(imageSize))
 	{
 		MessageBox(m_hwnd, "Could Not allocate Targa", "Error", MB_OK);
 		return false;
@@ -95,27 +127,16 @@ bool TextureClass::LoadTarga(OGL* openGL, char* fileName, unsigned int texUnit, 
 		return false;
 	}
 
-	openGL->glActiveTexture(GL_TEXTURE0 + texUnit);
-
-	glGenTextures(1, &m_textureID);
-	glBindTexture(GL_TEXTURE_2D, m_textureID);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_BGRA, GL_UNSIGNED_BYTE, targaImage);
-
-	if (wrap)
+	
+	m_images->setWidth(width);
+	m_images->setHeight(height);
+	if (!m_images->newImage(imageSize))
 	{
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+		MessageBox(m_hwnd, "Could Not allocate Targa", "Error", MB_OK);
+		return false;
 	}
-	else
-	{
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-	}
-
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-
-	openGL->glGenerateMipmap(GL_TEXTURE_2D);
+	m_images->setImage(targaImage, imageSize);
+	m_images->setSize(imageSize);
 
 	delete[] targaImage;
 	targaImage = 0;
@@ -125,10 +146,35 @@ bool TextureClass::LoadTarga(OGL* openGL, char* fileName, unsigned int texUnit, 
 	return true;
 }
 
-void TextureClass::ModifyTexture(OGL* openGL, unsigned int texUnit){
+void TextureClass::attatchImage(OGL* openGL, int index)
+{
+	unsigned char* texture = 0;
+
+	m_images->setCurrent(index);
+	
+	texture = new unsigned char[m_images->getSize()];
+	m_images->getImage(texture, m_images->getSize());
+
+	openGL->glActiveTexture(GL_TEXTURE0 + index);
+
+	glGenTextures(1, &m_textureID);
+	glBindTexture(GL_TEXTURE_2D, m_textureID);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_images->getWidth(), m_images->getHeight(), 0, GL_BGRA, GL_UNSIGNED_BYTE, texture);
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+
+	openGL->glGenerateMipmap(GL_TEXTURE_2D);
+
+	delete[] texture;
+	texture = 0;
+}
+
+void TextureClass::ModifyTexture(OGL* openGL, unsigned int texUnit, int width, int height){
 	unsigned char* targaImage = 0;
-	int width = 0;
-	int height = 0;
 
 	openGL->glActiveTexture(GL_TEXTURE0 + texUnit);
 
